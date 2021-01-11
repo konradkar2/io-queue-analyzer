@@ -27,10 +27,12 @@ class VideoManager(Thread):
     def analyze_and_save_frames(self):
         # load video capture from file
         video = cv2.VideoCapture(self.filename)
+        #get attributes from file
         self.video_length = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
         frame_width = int(video.get(3))
         frame_height = int(video.get(4))
 
+        #create output files names and open them
         filename_date = datetime.now().strftime("%d%m%Y-%H%M%S")
 
         file_output_path =  "output/" + filename_date + ".avi"
@@ -45,10 +47,9 @@ class VideoManager(Thread):
 
 
         frame_count = 0
+        #analyze video frame by frame
         while video.isOpened():
             # Read video capture
-
-
 
             ret, frame = video.read()
 
@@ -62,12 +63,15 @@ class VideoManager(Thread):
             person_color = []
             for i in range(len(boxes)):
                 try:
+                    #check each box produced by detector for threshold
+                    #threshold value is fetched from gui
                     threshold = int(self.gui_settings['threshold'].get())
                     threshold = threshold/100
                     if threshold < 0.1:
                         threshold = 0.1
+                #simple exception so threshold stays> 0
                 except:
-                    threshold = 0.2
+                    threshold = 0.1
                 if scores[i] < threshold:
                     continue
                 box = boxes[i]
@@ -96,6 +100,7 @@ class VideoManager(Thread):
             if ret == True:
                 out.write(frame)
 
+                #show preview depending on current gui settings
                 if self.gui_settings['show_preview'].get():
                     cv2.imshow("preview", frame)
                 else:
@@ -106,14 +111,15 @@ class VideoManager(Thread):
                     break
 
             
-                frame_count = frame_count +1;            
+                frame_count = frame_count +1;  
+                #create metadata for gui progress(progress bar, time left, etc.)    
                 data = {
                     "frame_count" : frame_count,
                     "video_length" : self.video_length,
                     "timestamp_begin": self.timestamp_begin,
                     "timestamp_now": time.time()
                 }
-            
+                #pass it to gui
                 self.gui_handler(data)
               
 

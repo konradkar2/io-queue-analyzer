@@ -15,6 +15,7 @@ class Gui:
         self._show_preview = tk.BooleanVar()
         self._set_controls()
 
+        #simple object that is passed to videoManager(running on different thread) to inform him about current settings
         self.settings = {
             'show_preview' : self._show_preview,
             'threshold' : self.spin_threshold
@@ -28,9 +29,9 @@ class Gui:
         
 
         self.root.mainloop() 
-    #("mp4 files","*.mp4"),("avi files","*.avi*")
+    #sets filename in the object and sets some text gui labels
     def _select_file_handler(self):        
-        file_obj = filedialog.askopenfile(mode="r",initialdir = "./",filetypes = (("all files","*.*"),))
+        file_obj = filedialog.askopenfile(mode="r",initialdir = "./",filetypes = (("all files","*.*"),("mp4 files","*.mp4"),("avi files","*.avi*")))
         filename = file_obj.name    
         if filename:
             self.filename = filename
@@ -40,7 +41,7 @@ class Gui:
 
             self.button_start.config(state="normal")
             
-
+    #handler that will take care of updating gui
     def _progress_changed_handler(self,data):
         frame_count = data['frame_count']
         video_length = data['video_length']
@@ -60,6 +61,11 @@ class Gui:
         seconds_left = (1/(_progress/100)* past_time) - past_time
         self.label_time_left.config(text = "Elapsed time left: " + str(round(seconds_left)) + " s")
    
+    
+    #creates VideoManager object and populates it
+    #settings is reference that keeps VideoManager on track with gui settings
+    #._progress_changed_handler is handler to update GUI through VideoManager object   
+    #starts its on a new thread
     def _begin_analyze_handler(self):   
         VideoManager(self.filename,self.detector,self.settings,lambda progress: self._progress_changed_handler(progress)).start()
        

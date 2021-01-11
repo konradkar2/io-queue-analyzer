@@ -30,7 +30,9 @@ class DetectorAPI:
         self.detection_classes = self.detection_graph.get_tensor_by_name('detection_classes:0')        
         self.num_detections = self.detection_graph.get_tensor_by_name('num_detections:0')
 
+    #process the frame - it will return detected object coordinates, threshold is not checked here - it is in videoManager
     def processFrame(self, image):
+        
         # Expand dimensions since the trained_model expects images to have shape: [1, None, None, 3]
         image_np_expanded = np.expand_dims(image, axis=0)
         # Actual detection.
