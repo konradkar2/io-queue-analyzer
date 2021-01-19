@@ -89,10 +89,11 @@ class VideoManager(Thread):
                 else:
                     color_val[2] +=1
 
+            people_num = color_val[0] + color_val[1] +color_val[2] 
 
             log_file_out.write(
                 str(frame_count) + ", " +
-                str(len(boxes)) + ", " +
+                str(people_num) + ", " +
                 str(color_val[0]) + ", " +
                 str(color_val[1]) + ", " +
                 str(color_val[2]) + "\n")
